@@ -1,0 +1,41 @@
+services:
+  app:
+    build:
+      context: .
+      args:
+        DATABASE_URL: ${DATABASE_URL}
+        WORKOS_API_KEY: ${WORKOS_API_KEY}
+        WORKOS_CLIENT_ID: ${WORKOS_CLIENT_ID}
+        WORKOS_REDIRECT_URI: ${WORKOS_REDIRECT_URI}
+        WORKOS_COOKIE_PASSWORD: ${WORKOS_COOKIE_PASSWORD}
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - WORKOS_API_KEY=${WORKOS_API_KEY}
+      - WORKOS_CLIENT_ID=${WORKOS_CLIENT_ID}
+      - WORKOS_REDIRECT_URI=${WORKOS_REDIRECT_URI}
+      - WORKOS_COOKIE_PASSWORD=${WORKOS_COOKIE_PASSWORD}
+    depends_on:
+      - postgres
+    ports:
+      - 3000:3000
+    command:
+      - /bin/sh
+      - -c
+      - |
+        npm run db:migrate
+        npm i
+        npm run dev
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+
+  postgres:
+    image: postgres:15
+    restart: always
+    container_name: postgres
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_DB: nextjs-trpc-drizzle-psql-boilerplate-db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
